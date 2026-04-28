@@ -225,10 +225,10 @@ export default function App() {
         <div className="mx-auto relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
             <div className="inline-block bg-orange-600 text-white font-black text-[10px] px-4 py-1.5 rounded-full uppercase tracking-[0.2em] mb-4 shadow-lg">
-              FPTI • PERMENPORA 15 / 2024
+              PERMENPORA 15 / 2024
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight italic uppercase">
-              VERTICAL <span className="text-orange-500">LIMITS</span>
+              PANJAT <span className="text-orange-500">TEBING</span>
             </h1>
           </div>
           <div className="text-left md:text-right w-full md:w-auto">
