@@ -228,7 +228,7 @@ export default function App() {
               PERMENPORA 15 / 2024
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight italic uppercase">
-              PANJAT <span className="text-orange-500">TEBING</span>
+              KALKULATOR FISIK <span className="text-orange-500"> PANJAT TEBING</span>
             </h1>
           </div>
           <div className="text-left md:text-right w-full md:w-auto">
@@ -244,7 +244,7 @@ export default function App() {
             )}
             <div className="mt-2">
                 <p className="font-black text-orange-500/80 text-[11px] tracking-[0.3em] uppercase">
-                  Climbing Analytics <span className="text-white">by fiqhipondaa9</span>
+                  Platform Olahraga <span className="text-white">by fiqhipondaa9</span>
                 </p>
             </div>
           </div>
@@ -258,7 +258,7 @@ export default function App() {
           <div className="bg-slate-900/50 rounded-[2.5rem] p-8 shadow-sm border border-slate-800 relative overflow-hidden backdrop-blur-xl">
             <div className="flex items-center gap-4 mb-8 border-b border-slate-800 pb-5 relative z-10">
               <div className="bg-orange-600 text-white p-3 rounded-2xl shadow-lg"><IconUser /></div>
-              <h2 className="text-2xl font-black text-white uppercase tracking-tight italic">Biographical Profile</h2>
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight italic">Identitas & Antropometri</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
@@ -326,7 +326,7 @@ export default function App() {
           <div className="bg-slate-900/50 rounded-[2.5rem] p-8 shadow-sm border border-slate-800 backdrop-blur-xl">
             <div className="flex items-center gap-4 mb-8 border-b border-slate-800 pb-5">
               <div className="bg-orange-100 text-orange-600 p-3 rounded-2xl"><IconMountain /></div>
-              <h2 className="text-2xl font-black text-white uppercase tracking-tight italic">Climbing Performance</h2>
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight italic">Rekam Hasil Tes Fisik</h2>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6">
