@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import * as htmlToImage from 'html-to-image';
+import qrisImage from './assets/shareqr.png';
 
 // --- KOMPONEN IKON SVG (Custom Climbing) ---
 const IconUser = () => <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
@@ -7,6 +8,8 @@ const IconScale = () => <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"
 const IconDownload = () => <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
 const IconReset = () => <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
 const IconMountain = () => <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>;
+const IconCoffee = () => <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>;
+const IconX = () => <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
 
 // --- FUNGSI SCORING LOGIC PANJAT TEBING ---
 const getScoreClimbing = (test, gender, value) => {
@@ -28,10 +31,10 @@ const getScoreClimbing = (test, gender, value) => {
     case 'pushUp': 
       return isM ? (v >= 75 ? 100 : v >= 60 ? 80 : v >= 53 ? 70 : v >= 45 ? 60 : 40) 
                  : (v >= 50 ? 100 : v >= 40 ? 80 : v >= 35 ? 70 : v >= 30 ? 60 : 40);
-    case 'shuttleRun': // Inverse (Makin Kecil Makin Baik)
+    case 'shuttleRun': 
       return isM ? (v <= 5.0 ? 100 : v <= 6.0 ? 80 : v <= 6.5 ? 70 : v <= 7.0 ? 60 : 40) 
                  : (v <= 6.0 ? 100 : v <= 7.2 ? 80 : v <= 7.8 ? 70 : v <= 8.4 ? 60 : 40);
-    case 'sprint20': // Inverse (Makin Kecil Makin Baik)
+    case 'sprint20': 
       return isM ? (v <= 2.75 ? 100 : v <= 3.30 ? 80 : v <= 3.58 ? 70 : v <= 3.85 ? 60 : 40) 
                  : (v <= 3.20 ? 100 : v <= 3.84 ? 80 : v <= 4.16 ? 70 : v <= 4.48 ? 60 : 40);
     case 'beep': 
@@ -103,11 +106,11 @@ const RadarChart = ({ data, labels, isBlanko }) => {
 export default function App() {
   const [identity, setIdentity] = useState({ name: '', origin: '', dob: '', gender: 'Putra' });
   const [anthro, setAnthro] = useState({ weight: '', height: '', armSpan: '', sitHeight: '' });
-  
   const [tests, setTests] = useState({ 
     sitReach: '', verticalJump: '', pullUp: '', sitUp: '', pushUp: '', shuttleRun: '', sprint20: '', beepLevel: '', beepShuttle: '' 
   });
   const [isExporting, setIsExporting] = useState(false);
+  const [showCoffeeModal, setShowCoffeeModal] = useState(false);
 
   const age = useMemo(() => {
     if (!identity.dob) return '-';
@@ -118,6 +121,17 @@ export default function App() {
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) calculatedAge--;
     return calculatedAge;
   }, [identity.dob]);
+
+  // --- TIMER AUTOMATION 33 MENIT ---
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!isExporting) {
+        setShowCoffeeModal(true);
+      }
+    }, 33 * 60 * 1000); // 33 Menit
+
+    return () => clearInterval(timer);
+  }, [isExporting]);
 
   const bmiData = useMemo(() => {
     if (!anthro.weight || !anthro.height || anthro.height <= 0) return { bmi: '-', status: '-', color: 'text-slate-500' };
@@ -131,7 +145,6 @@ export default function App() {
     return { bmi, status, color };
   }, [anthro.weight, anthro.height]);
 
-  // --- MESIN PENGHITUNG APE INDEX & RASIO TUNGKAI ---
   const proportionData = useMemo(() => {
     const h = parseFloat(anthro.height);
     const arm = parseFloat(anthro.armSpan);
@@ -159,11 +172,11 @@ export default function App() {
     return { apeIndex, legRatio };
   }, [anthro.height, anthro.armSpan, anthro.sitHeight]);
 
-  // --- MESIN PENGHITUNG VO2MAX OTOMATIS (BEEP TEST) ---
+  // --- MESIN PENGHITUNG VO2MAX OTOMATIS (FIXED SHUTTLE 0 DETECTION) ---
   const calculatedVO2Max = useMemo(() => {
     const l = parseInt(tests.beepLevel);
-    const s = parseInt(tests.beepShuttle);
-    if (!l || !s || l < 1 || s < 1) return ''; 
+    const s = tests.beepShuttle !== '' ? parseInt(tests.beepShuttle) : NaN;
+    if (!l || isNaN(s) || l < 1 || s < 0) return ''; 
     const vo2max = 3.46 * (l + s / (l * 0.4325 + 7.0048)) + 12.2;
     return parseFloat(vo2max.toFixed(2));
   }, [tests.beepLevel, tests.beepShuttle]);
@@ -192,7 +205,7 @@ export default function App() {
 
   const handleDownloadImage = async () => {
     setIsExporting(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 400)));
     try {
       const element = document.getElementById('report-container');
       const dataUrl = await htmlToImage.toPng(element, { quality: 1.0, backgroundColor: "#0f172a", pixelRatio: 2 });
@@ -207,17 +220,53 @@ export default function App() {
   const testInputClass = "w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 font-black text-white focus:outline-none focus:border-orange-500 transition-all pr-24 placeholder:text-[11px] placeholder:font-bold placeholder:text-slate-600 text-right";
 
   return (
-    <div id="report-container" className="min-h-screen bg-[#0f172a] flex flex-col items-center py-10 px-4 font-sans text-slate-300 print:bg-[#0f172a]">
+    <div id="report-container" className="min-h-screen bg-[#0f172a] flex flex-col items-center py-10 px-4 font-sans text-slate-300 print:bg-[#0f172a] relative">
       
       {isExporting && (
         <style dangerouslySetInnerHTML={{__html: `
-          #report-container input, #report-container select { appearance: none !important; -webkit-appearance: none; padding-bottom: 8px !important; color: white !important; }
+          #report-container input, #report-container select { appearance: none !important; -webkit-appearance: none; padding-bottom: 8px !important; color: #ffffff !important; }
           #report-container input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none !important; margin: 0 !important; }
         `}} />
       )}
 
+      {/* --- FAB KONSULTASI & APRESIASI --- */}
+      {!isExporting && (
+        <button 
+          onClick={() => setShowCoffeeModal(true)} 
+          className="no-print fixed bottom-8 right-8 bg-orange-600 hover:bg-orange-500 text-white h-14 rounded-full shadow-2xl z-50 flex items-center justify-center px-4 gap-0 hover:gap-3 transition-all duration-300 border-4 border-orange-100 group overflow-hidden"
+          title="Konsultasi & Apresiasi"
+        >
+          <div className="relative flex items-center justify-center">
+            <IconCoffee />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping"></span>
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white"></span>
+          </div>
+          <span className="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 transition-all duration-500 ease-in-out whitespace-nowrap font-black text-xs uppercase tracking-widest text-white ml-0 group-hover:ml-2">
+            Konsultasi WA
+          </span>
+        </button>
+      )}
+
+      {/* UNIFIED COFFEE MODAL */}
+      {showCoffeeModal && (
+        <div className="fixed inset-0 z-[200] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300 no-print">
+          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden text-center relative p-8">
+            <button onClick={() => setShowCoffeeModal(false)} className="absolute top-4 right-4 bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600 p-2 rounded-xl transition-colors"><IconX className="w-4 h-4" /></button>
+            <div className="bg-amber-100 text-amber-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"><IconCoffee /></div>
+            <h3 className="text-xl font-black text-slate-800 mb-2">Traktir Kopi Developer</h3>
+            <p className="text-xs font-bold text-slate-500 mb-6 leading-relaxed normal-case">Terima kasih telah menggunakan aplikasi ini! Dukungan Anda sangat berarti bagi pengembangan fitur selanjutnya.</p>
+            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6 flex justify-center">
+                <img src={qrisImage} alt="QRIS DANA" className="max-w-[200px] h-auto rounded-xl shadow-sm border border-slate-200" />
+            </div>
+            <a href="https://wa.me/6285340804702?text=Halo%20Developer,%20saya%20ingin%20konsultasi%20mengenai%20Aplikasi%20Kalkulator%20Fisik%20Panjat%20Tebing..." target="_blank" rel="noopener noreferrer" className="bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-xl shadow-md transition-colors w-full flex items-center justify-center gap-2 text-sm uppercase tracking-widest">
+                Konsultasi WhatsApp
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* HEADER: CLIMBING VERTICAL LIMIT THEME */}
-      <header className="bg-slate-900 text-white p-8 shadow-2xl relative overflow-hidden w-full max-w-7xl rounded-[2.5rem] border-b-8 border-orange-600">
+      <header className="bg-slate-900 text-white p-8 shadow-2xl relative overflow-hidden w-full max-w-7xl rounded-t-[2.5rem] border-b-8 border-orange-600">
         <div className="absolute top-0 right-0 w-full h-full opacity-10">
            <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-500 blur-[100px] rounded-full"></div>
         </div>
@@ -251,6 +300,7 @@ export default function App() {
         </div>
       </header>
 
+      {/* MAIN CONTAINER */}
       <main className={`${isExporting ? 'w-[1200px]' : 'max-w-7xl w-full'} mx-auto mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8`}>
         
         {/* LEFT COLUMN: BIOMETRICS */}
@@ -293,7 +343,6 @@ export default function App() {
                </div>
             </div>
 
-            {/* KOTAK APE INDEX & RASIO TUNGKAI */}
             {(anthro.height > 0 && (anthro.armSpan > 0 || anthro.sitHeight > 0)) && (
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10 animate-in fade-in">
                 <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-5 flex flex-col justify-center relative overflow-hidden">
@@ -317,7 +366,7 @@ export default function App() {
                    <div className="flex items-end gap-2 pl-2 mt-1">
                       <span className="text-3xl font-black text-white leading-none italic">{proportionData.legRatio.value}</span>
                    </div>
-                   <p className="text-[10px] font-bold text-slate-500 mt-2 pl-2 uppercase tracking-widest">{proportionData.legRatio.desc}</p>
+                   <p className="text-[10px] font-bold text-white mt-2 pl-2 uppercase tracking-widest">{proportionData.legRatio.desc}</p>
                 </div>
               </div>
             )}
@@ -376,6 +425,8 @@ export default function App() {
                     </div>
                  </div>
                </div>
+               {/* AKHIR BLOK BEEP TEST */}
+
             </div>
             <p className="mt-8 p-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest leading-relaxed">
               *Penghitungan skor mengacu pada tabel norma elit.<br/>Waktu Shuttle Run dan Sprint otomatis dikalkulasi berdasarkan reduksi waktu (Inverse Logic).
